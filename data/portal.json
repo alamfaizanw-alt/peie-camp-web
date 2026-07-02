@@ -1,0 +1,10 @@
+{
+  "keys": {
+    "explore": "9e2a19f86d018a52a93da9747f31296801c793af5de8d1924d62e3a02fc8b5e7",
+    "challenge": "3d0fe06b4c1409a80711291f178d3b5121318d8f8e23b71a2fd9c3446f5e7d6b",
+    "admins": [
+      { "label": "Founder key", "hash": "b85ca70c9c09ce731cbbe50f58dd5a6b25b9e521b0e5170ab74975121bbc1416" }
+    ]
+  },
+  "slides": []
+}
