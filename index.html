@@ -247,35 +247,51 @@ async function loadPortal(){
 
 /* ---------- data: write (commit via GitHub API) ---------- */
 async function fetchSha(){
-  const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
-    headers:{ 'Authorization':`Bearer ${ghToken}`, 'Accept':'application/vnd.github+json' }
+  fileSha = null;
+  const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURI(DATA_PATH)}?ref=main&t=${Date.now()}`, {
+    headers:{ 'Authorization':`Bearer ${ghToken}`, 'Accept':'application/vnd.github+json' },
+    cache:'no-store'
   });
-  if(!r.ok) throw new Error('sha');
-  const j = await r.json(); fileSha = j.sha;
+  if(r.status===404){ fileSha = 'NEW'; return; }        // file missing -> we'll create it
+  if(!r.ok) throw new Error('sha-http-'+r.status);
+  const j = await r.json();
+  if(Array.isArray(j) || !j.sha) throw new Error('sha-shape');
+  fileSha = j.sha;
 }
 async function savePortal(message){
   if(!ghToken){ toast('Connect GitHub first (top of the Admin page)'); adminTab='list'; renderAdmin(); return false; }
   if(!OWNER || !REPO){ toast('Set OWNER and REPO at the top of index.html for custom domains'); return false; }
-  const body = ()=> JSON.stringify({
-    message: `portal: ${message}`,
-    content: b64encodeUtf8(JSON.stringify(portal, null, 2)),
-    sha: fileSha
-  });
-  const put = ()=> fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
+  const body = ()=>{
+    const payload = { message:`portal: ${message}`, content: b64encodeUtf8(JSON.stringify(portal, null, 2)), branch:'main' };
+    if(fileSha && fileSha!=='NEW') payload.sha = fileSha;
+    return JSON.stringify(payload);
+  };
+  const put = ()=> fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURI(DATA_PATH)}`, {
     method:'PUT',
     headers:{ 'Authorization':`Bearer ${ghToken}`, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
     body: body()
   });
   try{
-    if(!fileSha) await fetchSha();
+    await fetchSha();                                    // always fetch fresh — stale sha causes 409/422
     let r = await put();
-    if(r.status===409){ await fetchSha(); r = await put(); }   // someone saved in between — retry on fresh sha
-    if(r.status===401 || r.status===403){ toast('GitHub rejected the token — check it has Contents \u2192 Read & write for this repo'); return false; }
-    if(!r.ok){ toast(`Save failed (GitHub said ${r.status}) — try again`); return false; }
+    if(r.status===409 || r.status===422){ await fetchSha(); r = await put(); }  // retry once on fresh sha
+    if(!r.ok){
+      let detail = '';
+      try{ detail = (await r.json()).message || ''; }catch(e){}
+      console.error('GitHub save failed', r.status, detail);
+      if(r.status===401) toast('GitHub rejected the token — it may be expired or mistyped');
+      else if(r.status===403 || r.status===404) toast('Token can\u2019t write to this repo — check it targets '+OWNER+'/'+REPO+' with Contents: Read & write');
+      else toast(`Save failed — GitHub said ${r.status}: ${detail.slice(0,80)}`);
+      return false;
+    }
     const j = await r.json(); fileSha = j.content.sha;
     toast(message.charAt(0).toUpperCase()+message.slice(1));
     return true;
-  }catch(e){ toast('Save failed — check your connection and try again'); return false; }
+  }catch(e){
+    console.error('save error', e);
+    toast('Save failed ('+ (e.message||'network') +') — see browser console for details');
+    return false;
+  }
 }
 
 /* ---------- navigation ---------- */
