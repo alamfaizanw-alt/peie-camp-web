@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEIE STEM Summer Robotics Camp</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#61B82F; --green-dk:#4E9A22; --green-lt:#EEF7E2;
+    --blue:#1C72AB;  --blue-dk:#155D8D;  --blue-lt:#E7F1F8;
+    --navy:#04263F;  --ink:#13314A; --mute:#5C6F7E;
+    --paper:#F4F9FC; --white:#FFFFFF; --line:#DDE8EF;
+    --r-lg:26px; --r-md:18px; --r-sm:12px;
+    --shadow:0 6px 18px rgba(4,38,63,.10);
+    --shadow-lg:0 14px 34px rgba(4,38,63,.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Nunito',system-ui,sans-serif; color:var(--ink); background:var(--paper); line-height:1.5;}
+  h1,h2,h3{font-family:'Baloo 2','Nunito',sans-serif;}
+  button{font-family:inherit; cursor:pointer;} input,select{font-family:inherit;}
+  a{color:var(--blue);}
+  header{background:var(--navy); color:#fff; padding:14px 22px; display:flex; align-items:center; gap:14px; position:sticky; top:0; z-index:20;}
+  header .bot{width:40px;height:40px;flex:0 0 auto;}
+  header .titles{flex:1; min-width:0;}
+  header .titles .t1{font-family:'Baloo 2';font-weight:700;font-size:17px;line-height:1.15;}
+  header .titles .t2{font-size:11.5px;color:#9FC0D4;}
+  .btn{border:none; border-radius:999px; padding:10px 20px; font-weight:800; font-size:14px; transition:transform .12s ease, box-shadow .12s ease;}
+  .btn:hover{transform:translateY(-1px); box-shadow:var(--shadow);}
+  .btn:focus-visible{outline:3px solid #8FD25E; outline-offset:2px;}
+  .btn-home{background:#fff;color:var(--navy);}
+  .btn-green{background:var(--green);color:#fff;}
+  .btn-blue{background:var(--blue);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--mute);border:2px solid var(--line);}
+  .btn:disabled{opacity:.55;cursor:default;transform:none;box-shadow:none;}
+  main{max-width:1060px; margin:0 auto; padding:34px 22px 80px;}
+  .stud-row{display:flex; gap:14px; padding:0 26px; height:16px;}
+  .stud{width:34px;height:16px;border-radius:10px 10px 0 0;}
+  .brick{border-radius:var(--r-lg); padding:30px 30px 26px; color:#fff; box-shadow:var(--shadow-lg); position:relative; transition:transform .15s ease;}
+  .brick.click:hover{transform:translateY(-4px);}
+  .brick h2{font-size:30px; line-height:1.1;}
+  .brick p{opacity:.92; margin-top:8px; font-size:15px;}
+  .g .brick,.g .stud{background:var(--green);}
+  .b .brick,.b .stud{background:var(--blue);}
+  .brick .tag{display:inline-block; background:rgba(255,255,255,.22); border-radius:999px; padding:4px 14px; font-size:12.5px; font-weight:800; letter-spacing:.06em; margin-bottom:12px;}
+  .brick .go{margin-top:18px; background:#fff; border:none; border-radius:999px; padding:11px 24px; font-weight:800; font-size:15px;}
+  .g .brick .go{color:var(--green-dk);} .b .brick .go{color:var(--blue-dk);}
+  .hero{text-align:center; margin-bottom:38px;}
+  .hero .bot{width:120px;height:120px;margin:0 auto 10px;}
+  .hero h1{font-size:clamp(30px,5vw,44px); color:var(--navy); line-height:1.08;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--mute); margin-top:8px; font-size:16px;}
+  .sections{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:30px;}
+  footer{max-width:1060px;margin:0 auto;padding:0 22px 40px;display:flex;justify-content:space-between;align-items:center;color:var(--mute);font-size:13px;}
+  footer button{background:none;border:none;color:var(--mute);font-size:13px;text-decoration:underline;}
+  footer button:hover{color:var(--navy);}
+  .gate{max-width:430px;margin:30px auto 0;background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:36px 34px;text-align:center;}
+  .gate .bot{width:84px;height:84px;margin:0 auto 6px;}
+  .gate h2{font-size:26px;color:var(--navy);}
+  .gate p{color:var(--mute);font-size:14px;margin:6px 0 20px;}
+  .gate input{width:100%;padding:13px 16px;border:2px solid var(--line);border-radius:var(--r-sm);font-size:16px;text-align:center;letter-spacing:.08em;font-weight:700;}
+  .gate input:focus{outline:none;border-color:var(--blue);}
+  .gate .btn{width:100%;margin-top:14px;padding:13px;}
+  .gate .err{color:#C0392B;font-size:13.5px;font-weight:700;margin-top:12px;min-height:18px;}
+  .sec-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:26px;}
+  .sec-head h1{font-size:30px;color:var(--navy);}
+  .pill{border-radius:999px;padding:5px 16px;font-weight:800;font-size:13px;color:#fff;}
+  .week{margin-bottom:26px;background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden;}
+  .week>button{width:100%;display:flex;align-items:center;gap:14px;background:none;border:none;padding:18px 24px;font-size:19px;font-family:'Baloo 2';font-weight:700;color:var(--navy);text-align:left;}
+  .week .wk-num{width:44px;height:44px;border-radius:14px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;}
+  .week .count{margin-left:auto;color:var(--mute);font-size:13.5px;font-family:'Nunito';font-weight:700;}
+  .week .chev{transition:transform .2s;color:var(--mute);}
+  .week.open .chev{transform:rotate(90deg);}
+  .slides{display:none;padding:6px 22px 22px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .week.open .slides{display:grid;}
+  .slide-card{display:block;text-decoration:none;border-radius:var(--r-md);padding:18px;color:var(--ink);border:2px solid var(--line);background:var(--paper);transition:transform .12s ease, box-shadow .12s ease;}
+  .slide-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+  .slide-card .ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+  .slide-card .ico svg{width:22px;height:22px;}
+  .slide-card .nm{font-weight:800;font-size:15.5px;line-height:1.25;}
+  .slide-card .op{font-size:12.5px;color:var(--mute);margin-top:6px;font-weight:700;}
+  .empty{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);padding:46px 30px;text-align:center;color:var(--mute);}
+  .empty .bot{width:90px;height:90px;margin:0 auto 8px;opacity:.9;}
+  .empty b{color:var(--navy);font-size:18px;font-family:'Baloo 2';display:block;margin-bottom:4px;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+  .tabs button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 20px;font-weight:800;font-size:14px;color:var(--mute);}
+  .tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .card{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);padding:26px;margin-bottom:22px;}
+  .card h3{font-size:20px;color:var(--navy);margin-bottom:14px;}
+  .frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+  .frm .full{grid-column:1/-1;}
+  .frm label{font-size:12.5px;font-weight:800;color:var(--mute);display:block;margin-bottom:5px;letter-spacing:.03em;}
+  .frm input,.frm select{width:100%;padding:11px 13px;border:2px solid var(--line);border-radius:var(--r-sm);font-size:14.5px;background:#fff;}
+  .frm input:focus,.frm select:focus{outline:none;border-color:var(--blue);}
+  .frm input.bad{border-color:#C0392B;background:#FDF3F1;}
+  .field-err{grid-column:1/-1;color:#C0392B;font-size:13px;font-weight:700;min-height:16px;}
+  .check{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;color:var(--ink);padding-top:24px;}
+  .check input{width:19px;height:19px;accent-color:var(--green);}
+  .row-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th{color:var(--mute);text-align:left;font-size:12px;letter-spacing:.05em;padding:8px 10px;border-bottom:2px solid var(--line);}
+  td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  td .nm{font-weight:800;}
+  td .lk{font-size:12px;color:var(--mute);max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}
+  .chip{display:inline-block;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:800;color:#fff;}
+  .chip.hid{background:#8FA3B0;}
+  .mini{border:none;background:var(--paper);border-radius:9px;padding:7px 12px;font-weight:800;font-size:12.5px;color:var(--navy);margin:2px;}
+  .mini:hover{background:var(--blue-lt);}
+  .mini.red{color:#C0392B;}
+  .note{background:var(--green-lt);border-radius:var(--r-md);padding:14px 18px;font-size:13.5px;color:var(--ink);margin-top:14px;}
+  .note.b{background:var(--blue-lt);}
+  .note.warn{background:#FCF3E3;}
+  .keylist li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);list-style:none;font-weight:700;}
+  .help h4{font-family:'Baloo 2';color:var(--navy);font-size:17px;margin:18px 0 6px;}
+  .help p,.help li{font-size:14.5px;color:var(--ink);margin-bottom:6px;}
+  .help ol,.help ul{padding-left:22px;}
+  .help code{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:13px;}
+  .ghstat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 16px;font-weight:800;font-size:13px;}
+  .ghstat.on{background:var(--green-lt);color:var(--green-dk);}
+  .ghstat.off{background:#FCF3E3;color:#9A6B15;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;border-radius:999px;padding:12px 26px;font-weight:800;font-size:14px;box-shadow:var(--shadow-lg);transition:transform .25s ease;z-index:50;max-width:88vw;text-align:center;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .loading{text-align:center;color:var(--mute);padding:70px 0;font-weight:700;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+  @media (max-width:560px){ header .titles .t2{display:none;} main{padding:24px 14px 60px;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="bot" id="hdrBot"></div>
+  <div class="titles">
+    <div class="t1">PEIE STEM Summer Robotics Camp</div>
+    <div class="t2">The Education Bank &middot; powered by Parents Engaged in Education</div>
+  </div>
+  <button class="btn btn-home" id="homeBtn" style="display:none">&#8962; Home</button>
+</header>
+
+<main id="app"><div class="loading">Loading the camp portal&hellip;</div></main>
+
+<footer>
+  <span>&copy; 2026 Parents Engaged in Education &middot; FIRST&reg; LEGO&reg; League camp</span>
+  <button id="adminLink">Staff sign-in</button>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   PEIE Camp Portal — GitHub Pages edition
+   Data lives in this repo at data/portal.json.
+   Reading: public (GitHub API raw, falls back to the Pages copy).
+   Writing: commits via GitHub API — requires a staff token.
+   ========================================================= */
+
+/* If you use a custom domain, set these two by hand, e.g. OWNER='zan123', REPO='peie-camp'. */
+let OWNER = '', REPO = '';
+(function detectRepo(){
+  const h = location.hostname, seg = location.pathname.split('/').filter(Boolean);
+  if (h.endsWith('.github.io')) { OWNER = h.split('.')[0]; REPO = seg[0] || (OWNER + '.github.io'); }
+})();
+const DATA_PATH = 'data/portal.json';
+
+const COLORS = { explore:'var(--green)', challenge:'var(--blue)' };
+const SECTION_LABEL = { explore:'FLL Explore', challenge:'FLL Challenge' };
+
+let portal = null;                 // { keys:{...}, slides:[...] }
+let fileSha = null;                // sha of data/portal.json for commits
+let ghToken = null;                // staff GitHub token — memory only
+let session = { explore:false, challenge:false, admin:false };
+let view = { page:'home' };
+let adminTab = 'list';
+let editingId = null;
+
+const app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text.trim()));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function b64encodeUtf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin);
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function botSVG(head='#1C72AB', acc='#61B82F'){
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="50" cy="14" r="6" fill="${acc}"/><rect x="47.5" y="16" width="5" height="10" rx="2.5" fill="#8AA0B0"/>
+    <rect x="15" y="24" width="70" height="60" rx="19" fill="${head}"/>
+    <circle cx="13" cy="54" r="6.5" fill="${acc}"/><circle cx="87" cy="54" r="6.5" fill="${acc}"/>
+    <rect x="24" y="34" width="52" height="40" rx="12" fill="#ECF4F9"/>
+    <circle cx="40" cy="50" r="7.5" fill="#04263F"/><circle cx="60" cy="50" r="7.5" fill="#04263F"/>
+    <circle cx="43" cy="47.5" r="2.4" fill="#fff"/><circle cx="63" cy="47.5" r="2.4" fill="#fff"/>
+    <ellipse cx="50" cy="64" rx="8.5" ry="4.6" fill="${acc}"/>
+  </svg>`;
+}
+document.getElementById('hdrBot').innerHTML = botSVG('#61B82F','#1C72AB');
+
+/* ---------- Google Drive / Slides link validation ---------- */
+function checkDriveLink(raw){
+  let url;
+  try { url = new URL(raw.trim()); } catch { return { ok:false, why:'That isn\u2019t a full web link. Copy the whole address, starting with https://' }; }
+  if (url.protocol !== 'https:') return { ok:false, why:'The link must start with https://' };
+  const host = url.hostname, path = url.pathname;
+  // Google Slides deck
+  if (host === 'docs.google.com' && /^\/presentation\/d\/(e\/)?[\w-]+/.test(path)){
+    let clean = raw.trim();
+    // open decks in present mode for students instead of the editor
+    clean = clean.replace(/\/edit[^?#]*/, '/present');
+    return { ok:true, url:clean, kind:'Google Slides deck' };
+  }
+  // Drive file (PDF, PPTX, etc.)
+  if (host === 'drive.google.com' && /^\/file\/d\/[\w-]+/.test(path)){
+    let clean = raw.trim().replace(/\/(edit|view)[^?#]*/, '/view');
+    if(!/\/view/.test(clean)) clean = clean.replace(/(\/file\/d\/[\w-]+).*/, '$1/view');
+    return { ok:true, url:clean, kind:'Google Drive file' };
+  }
+  if (host === 'drive.google.com' && path === '/open' && url.searchParams.get('id')){
+    return { ok:true, url:`https://drive.google.com/file/d/${url.searchParams.get('id')}/view`, kind:'Google Drive file' };
+  }
+  // published-to-web slides
+  if (host === 'docs.google.com' && /^\/presentation\/d\/e\/[\w-]+\/pub/.test(path)){
+    return { ok:true, url:raw.trim(), kind:'published Google Slides' };
+  }
+  if (host.endsWith('google.com')) return { ok:false, why:'That Google link isn\u2019t a Slides deck or a Drive file. In Drive, open the file, click Share \u2192 \u201CAnyone with the link\u201D \u2192 Viewer, then use Copy link.' };
+  return { ok:false, why:'Only Google Drive or Google Slides links work here. Upload the PDF or deck to Drive first, set sharing to \u201CAnyone with the link \u2013 Viewer\u201D, and paste that link.' };
+}
+
+/* ---------- data: read ---------- */
+async function loadPortal(){
+  // Freshest copy: GitHub API raw (no CDN cache). Fallback: the Pages-served file.
+  if (OWNER && REPO){
+    try{
+      const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, { headers:{ 'Accept':'application/vnd.github.raw' } });
+      if (r.ok){ portal = await r.json(); return; }
+    }catch(e){ /* fall through */ }
+  }
+  const r2 = await fetch(`${DATA_PATH}?nocache=${Date.now()}`);
+  if (!r2.ok) throw new Error('portal.json missing');
+  portal = await r2.json();
+}
+
+/* ---------- data: write (commit via GitHub API) ---------- */
+async function fetchSha(){
+  const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
+    headers:{ 'Authorization':`Bearer ${ghToken}`, 'Accept':'application/vnd.github+json' }
+  });
+  if(!r.ok) throw new Error('sha');
+  const j = await r.json(); fileSha = j.sha;
+}
+async function savePortal(message){
+  if(!ghToken){ toast('Connect GitHub first (top of the Admin page)'); adminTab='list'; renderAdmin(); return false; }
+  if(!OWNER || !REPO){ toast('Set OWNER and REPO at the top of index.html for custom domains'); return false; }
+  const body = ()=> JSON.stringify({
+    message: `portal: ${message}`,
+    content: b64encodeUtf8(JSON.stringify(portal, null, 2)),
+    sha: fileSha
+  });
+  const put = ()=> fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
+    method:'PUT',
+    headers:{ 'Authorization':`Bearer ${ghToken}`, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
+    body: body()
+  });
+  try{
+    if(!fileSha) await fetchSha();
+    let r = await put();
+    if(r.status===409){ await fetchSha(); r = await put(); }   // someone saved in between — retry on fresh sha
+    if(r.status===401 || r.status===403){ toast('GitHub rejected the token — check it has Contents \u2192 Read & write for this repo'); return false; }
+    if(!r.ok){ toast(`Save failed (GitHub said ${r.status}) — try again`); return false; }
+    const j = await r.json(); fileSha = j.content.sha;
+    toast(message.charAt(0).toUpperCase()+message.slice(1));
+    return true;
+  }catch(e){ toast('Save failed — check your connection and try again'); return false; }
+}
+
+/* ---------- navigation ---------- */
+function go(page, section){
+  view = { page, section };
+  document.getElementById('homeBtn').style.display = page==='home' ? 'none' : '';
+  render(); window.scrollTo({top:0});
+}
+document.getElementById('homeBtn').onclick = ()=>go('home');
+document.getElementById('adminLink').onclick = ()=> session.admin ? go('admin') : go('gate','admin');
+
+function render(){
+  if(view.page==='home') return renderHome();
+  if(view.page==='gate') return renderGate(view.section);
+  if(view.page==='student') return renderStudent(view.section);
+  if(view.page==='admin') return renderAdmin();
+}
+
+/* ---------- home ---------- */
+function renderHome(){
+  app.innerHTML = `
+    <div class="hero">
+      <div class="bot">${botSVG('#1C72AB','#61B82F')}</div>
+      <h1>Welcome to <span>Robotics Camp!</span></h1>
+      <p>Pick your team section to see this week's slides.</p>
+    </div>
+    <div class="sections">
+      <div class="g">
+        <div class="stud-row"><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+        <div class="brick click" id="cardExp" role="button" tabindex="0" aria-label="Enter FLL Explore">
+          <span class="tag">AGES 6&ndash;8</span><h2>FLL Explore</h2>
+          <p>Build a moving LEGO model, discover a real-world theme, and share it with your team.</p>
+          <button class="go">Enter Explore &rarr;</button>
+        </div>
+      </div>
+      <div class="b">
+        <div class="stud-row"><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+        <div class="brick click" id="cardCha" role="button" tabindex="0" aria-label="Enter FLL Challenge">
+          <span class="tag">AGES 9&ndash;14</span><h2>FLL Challenge</h2>
+          <p>Build and code a robot for missions on the game mat, plus your Innovation Project.</p>
+          <button class="go">Enter Challenge &rarr;</button>
+        </div>
+      </div>
+    </div>`;
+  const open = sec => ()=> session[sec] ? go('student',sec) : go('gate',sec);
+  ['Exp','Cha'].forEach((k,i)=>{
+    const el = document.getElementById('card'+k), sec = i? 'challenge':'explore';
+    el.onclick = open(sec);
+    el.onkeydown = e => { if(e.key==='Enter'||e.key===' ') { e.preventDefault(); open(sec)(); } };
+  });
+}
+
+/* ---------- gate ---------- */
+function renderGate(section){
+  const isAdmin = section==='admin';
+  const color = isAdmin ? 'var(--navy)' : COLORS[section];
+  const label = isAdmin ? 'Staff / Admin' : SECTION_LABEL[section];
+  app.innerHTML = `
+    <div class="gate">
+      <div class="bot">${botSVG(isAdmin?'#04263F':(section==='explore'?'#61B82F':'#1C72AB'), section==='explore'?'#1C72AB':'#61B82F')}</div>
+      <h2>${label}</h2>
+      <p>${isAdmin ? 'Enter an admin key to manage the portal.' : 'Ask your coach for the section key!'}</p>
+      <input id="keyIn" type="password" placeholder="Enter key" autocomplete="off" aria-label="Access key">
+      <button class="btn" id="unlock" style="background:${color};color:#fff">Unlock</button>
+      <div class="err" id="gateErr"></div>
+    </div>`;
+  const input = document.getElementById('keyIn'); input.focus();
+  const attempt = async ()=>{
+    const btn = document.getElementById('unlock'); btn.disabled = true;
+    const h = await sha256(input.value || '');
+    const ok = isAdmin ? portal.keys.admins.some(a=>a.hash===h) : (portal.keys[section]===h);
+    if(ok){ session[isAdmin?'admin':section] = true; go(isAdmin?'admin':'student', section); }
+    else{ document.getElementById('gateErr').textContent = 'That key didn\u2019t work — check with your coach.'; btn.disabled=false; input.select(); }
+  };
+  document.getElementById('unlock').onclick = attempt;
+  input.onkeydown = e => { if(e.key==='Enter') attempt(); };
+}
+
+/* ---------- student ---------- */
+function renderStudent(section){
+  const color = COLORS[section];
+  const list = portal.slides.filter(s=>s.section===section && !s.hidden);
+  const weeks = [...new Set(list.map(s=>s.week))].sort((a,b)=>a-b);
+  let body;
+  if(!list.length){
+    body = `<div class="empty">
+      <div class="bot">${botSVG(section==='explore'?'#61B82F':'#1C72AB', section==='explore'?'#1C72AB':'#61B82F')}</div>
+      <b>No slides yet!</b>Your coaches haven\u2019t posted slides for this section. Check back soon.</div>`;
+  } else {
+    body = weeks.map((w,i)=>{
+      const items = list.filter(s=>s.week===w);
+      return `<section class="week ${i===weeks.length-1?'open':''}">
+        <button aria-expanded="${i===weeks.length-1}">
+          <span class="wk-num" style="background:${color}">${w}</span>
+          Week ${w}
+          <span class="count">${items.length} slide${items.length>1?'s':''}</span>
+          <span class="chev">&#9654;</span>
+        </button>
+        <div class="slides">
+          ${items.map(s=>`
+            <a class="slide-card" href="${esc(s.url)}" target="_blank" rel="noopener">
+              <div class="ico" style="background:${section==='explore'?'var(--green-lt)':'var(--blue-lt)'}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="${section==='explore'?'#4E9A22':'#155D8D'}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="nm">${esc(s.name)}</div>
+              <div class="op">Open slides &rarr;</div>
+            </a>`).join('')}
+        </div>
+      </section>`;
+    }).join('');
+  }
+  app.innerHTML = `
+    <div class="sec-head">
+      <h1>${SECTION_LABEL[section]}</h1>
+      <span class="pill" style="background:${color}">${section==='explore'?'Ages 6\u20138':'Ages 9\u201314'}</span>
+    </div>
+    ${body}`;
+  app.querySelectorAll('.week>button').forEach(btn=>{
+    btn.onclick = ()=>{ const w=btn.parentElement; btn.setAttribute('aria-expanded', w.classList.toggle('open')); };
+  });
+}
+
+/* ---------- admin ---------- */
+function renderAdmin(){
+  const tabs = [['list','All slides'],['add', editingId?'Edit slide':'Add slide'],['keys','Access keys'],['help','How it works']];
+  app.innerHTML = `
+    <div class="sec-head">
+      <h1>Admin</h1><span class="pill" style="background:var(--navy)">Staff only</span>
+      <span class="ghstat ${ghToken?'on':'off'}" style="margin-left:auto">${ghToken?'GitHub connected \u2713':'GitHub not connected'}</span>
+    </div>
+    ${ghToken?'':`<div class="card"><h3>Connect GitHub to save changes</h3>
+      <p style="font-size:14px;color:var(--mute);margin-bottom:12px">You can browse without it, but adding, editing, hiding, or deleting slides commits to the repo — that needs a staff GitHub token. It stays in this tab\u2019s memory only and is forgotten when the page closes. (Setup steps are in <b>How it works</b>.)</p>
+      <div class="frm"><div class="full"><label>GitHub fine-grained token</label><input id="ghTok" type="password" placeholder="github_pat_..."></div></div>
+      <div class="row-actions"><button class="btn btn-blue" id="ghConnect">Connect</button></div>
+    </div>`}
+    <div class="tabs">${tabs.map(([id,l])=>`<button data-t="${id}" class="${adminTab===id?'on':''}">${l}</button>`).join('')}</div>
+    <div id="tabBody"></div>`;
+  const gc = document.getElementById('ghConnect');
+  if(gc) gc.onclick = ()=>{
+    const v = document.getElementById('ghTok').value.trim();
+    if(!v) return toast('Paste the token first');
+    ghToken = v; fileSha = null; renderAdmin();
+  };
+  app.querySelectorAll('.tabs button').forEach(b=> b.onclick = ()=>{ adminTab=b.dataset.t; if(adminTab!=='add') editingId=null; renderAdmin(); });
+  const body = document.getElementById('tabBody');
+  if(adminTab==='list') return adminList(body);
+  if(adminTab==='add') return adminForm(body);
+  if(adminTab==='keys') return adminKeys(body);
+  if(adminTab==='help') return adminHelp(body);
+}
+
+function adminList(el){
+  const rows = [...portal.slides].sort((a,b)=> a.section.localeCompare(b.section) || a.week-b.week || a.name.localeCompare(b.name));
+  el.innerHTML = `<div class="card">
+    <h3>All slides (${rows.length})</h3>
+    ${rows.length? `<div style="overflow-x:auto"><table>
+      <tr><th>Name</th><th>Section</th><th>Week</th><th>Status</th><th></th></tr>
+      ${rows.map(s=>`<tr>
+        <td><span class="nm">${esc(s.name)}</span><a class="lk" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></td>
+        <td><span class="chip" style="background:${COLORS[s.section]}">${SECTION_LABEL[s.section]}</span></td>
+        <td>Week ${s.week}</td>
+        <td>${s.hidden?'<span class="chip hid">Hidden</span>':'<span class="chip" style="background:var(--green)">Visible</span>'}</td>
+        <td style="white-space:nowrap">
+          <button class="mini" data-act="edit" data-id="${s.id}">Edit</button>
+          <button class="mini" data-act="hide" data-id="${s.id}">${s.hidden?'Show':'Hide'}</button>
+          <button class="mini red" data-act="del" data-id="${s.id}">Delete</button>
+        </td></tr>`).join('')}
+    </table></div>` : `<p style="color:var(--mute)">No slides yet — use <b>Add slide</b> to post the first one.</p>`}
+  </div>`;
+  el.querySelectorAll('.mini').forEach(b=> b.onclick = ()=> adminAction(b.dataset.act, b.dataset.id));
+}
+async function adminAction(act,id){
+  const s = portal.slides.find(x=>x.id===id); if(!s) return;
+  if(act==='edit'){ editingId=id; adminTab='add'; renderAdmin(); return; }
+  if(act==='hide'){
+    s.hidden=!s.hidden;
+    if(await savePortal(s.hidden?'slide hidden from students':'slide made visible')) renderAdmin();
+    else s.hidden=!s.hidden;
+    return;
+  }
+  if(act==='del'){
+    if(!confirm(`Delete "${s.name}" (Week ${s.week}, ${SECTION_LABEL[s.section]})?\nThis can\u2019t be undone.`)) return;
+    const keep = portal.slides;
+    portal.slides = portal.slides.filter(x=>x.id!==id);
+    if(await savePortal('slide deleted')) renderAdmin();
+    else portal.slides = keep;
+  }
+}
+function adminForm(el){
+  const s = editingId ? portal.slides.find(x=>x.id===editingId) : null;
+  el.innerHTML = `<div class="card">
+    <h3>${s?'Edit slide':'Add a slide'}</h3>
+    <div class="frm">
+      <div class="full"><label>Display name (what students see)</label>
+        <input id="fName" placeholder="e.g. Week 1 — Meet Your Robot!" value="${s?esc(s.name):''}"></div>
+      <div class="full"><label>Slide link — Google Slides deck or a PDF in Google Drive</label>
+        <input id="fUrl" placeholder="https://docs.google.com/presentation/d/... or https://drive.google.com/file/d/..." value="${s?esc(s.url):''}"></div>
+      <div class="field-err" id="fUrlErr"></div>
+      <div><label>Section</label>
+        <select id="fSec">
+          <option value="explore" ${s&&s.section==='explore'?'selected':''}>FLL Explore</option>
+          <option value="challenge" ${s&&s.section==='challenge'?'selected':''}>FLL Challenge</option>
+        </select></div>
+      <div><label>Week</label>
+        <select id="fWeek">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${s&&s.week===i+1?'selected':''}>Week ${i+1}</option>`).join('')}</select></div>
+      <label class="check"><input type="checkbox" id="fHide" ${s&&s.hidden?'checked':''}> Hide from students for now</label>
+    </div>
+    <div class="row-actions">
+      <button class="btn btn-green" id="fSave">${s?'Save changes':'Add slide'}</button>
+      ${s?'<button class="btn btn-ghost" id="fCancel">Cancel</button>':''}
+    </div>
+    <div class="note">Links are checked automatically: Google Slides decks open in present mode, and Drive links open the file viewer. Remember to set the file\u2019s sharing to <b>Anyone with the link &rarr; Viewer</b>, or students will hit Google\u2019s \u201Crequest access\u201D wall.</div>
+  </div>`;
+  const urlIn = document.getElementById('fUrl'), urlErr = document.getElementById('fUrlErr');
+  const save = async ()=>{
+    const name = document.getElementById('fName').value.trim();
+    if(!name) return toast('Give the slide a display name');
+    const check = checkDriveLink(urlIn.value);
+    if(!check.ok){ urlIn.classList.add('bad'); urlErr.textContent = check.why; return; }
+    urlIn.classList.remove('bad'); urlErr.textContent='';
+    const data = { name, url:check.url, section:document.getElementById('fSec').value,
+      week:parseInt(document.getElementById('fWeek').value,10),
+      hidden:document.getElementById('fHide').checked };
+    const undo = s ? {...s} : null;
+    if(s) Object.assign(s, data);
+    else portal.slides.push({ id:uid(), added:Date.now(), ...data });
+    const ok = await savePortal(s?'slide updated':`slide added (${check.kind})`);
+    if(ok){ editingId=null; adminTab='list'; renderAdmin(); }
+    else { if(s && undo) Object.assign(s, undo); else portal.slides.pop(); }
+  };
+  urlIn.oninput = ()=>{ urlIn.classList.remove('bad'); urlErr.textContent=''; };
+  document.getElementById('fSave').onclick = save;
+  const c = document.getElementById('fCancel'); if(c) c.onclick = ()=>{ editingId=null; adminTab='list'; renderAdmin(); };
+}
+function adminKeys(el){
+  el.innerHTML = `
+  <div class="card"><h3>Student section keys</h3>
+    <div class="frm">
+      <div><label>New FLL Explore key</label><input id="kExp" placeholder="Leave blank to keep current"></div>
+      <div><label>New FLL Challenge key</label><input id="kCha" placeholder="Leave blank to keep current"></div>
+    </div>
+    <div class="row-actions"><button class="btn btn-blue" id="kSaveStu">Update student keys</button></div>
+    <div class="note b">Keys are stored as one-way hashes — nobody can read a key back, so write new keys down when you set them.</div>
+  </div>
+  <div class="card"><h3>Admin keys (${portal.keys.admins.length})</h3>
+    <ul class="keylist">${portal.keys.admins.map((a,i)=>`
+      <li><span style="flex:1">${esc(a.label)}</span>
+      ${portal.keys.admins.length>1?`<button class="mini red" data-i="${i}">Remove</button>`:'<span style="font-size:12px;color:var(--mute)">Last key — can\u2019t remove</span>'}</li>`).join('')}
+    </ul>
+    <div class="frm" style="margin-top:14px">
+      <div><label>Key label (e.g. \u201CInstructor \u2014 Nabiha\u201D)</label><input id="kLabel"></div>
+      <div><label>New admin key</label><input id="kAdmin"></div>
+    </div>
+    <div class="row-actions"><button class="btn btn-green" id="kAddAdm">Add admin key</button></div>
+    <div class="note warn">Remember: admin keys open this panel, but <b>saving</b> anything also needs the GitHub token. Someone with a leaked admin key and no token can look, but can\u2019t touch.</div>
+  </div>`;
+  document.getElementById('kSaveStu').onclick = async ()=>{
+    const e = document.getElementById('kExp').value.trim(), c = document.getElementById('kCha').value.trim();
+    if(!e && !c) return toast('Type a new key first');
+    const old = {...portal.keys};
+    if(e) portal.keys.explore = await sha256(e);
+    if(c) portal.keys.challenge = await sha256(c);
+    if(!await savePortal('student keys updated')) portal.keys = old;
+  };
+  document.getElementById('kAddAdm').onclick = async ()=>{
+    const l = document.getElementById('kLabel').value.trim(), k = document.getElementById('kAdmin').value.trim();
+    if(!l || !k) return toast('Fill in both the label and the key');
+    portal.keys.admins.push({label:l, hash:await sha256(k)});
+    if(await savePortal(`admin key added: ${l}`)) renderAdmin();
+    else portal.keys.admins.pop();
+  };
+  el.querySelectorAll('.keylist .mini').forEach(b=> b.onclick = async ()=>{
+    const i = +b.dataset.i;
+    if(!confirm(`Remove admin key "${portal.keys.admins[i].label}"?`)) return;
+    const removed = portal.keys.admins.splice(i,1)[0];
+    if(await savePortal(`admin key removed: ${removed.label}`)) renderAdmin();
+    else portal.keys.admins.splice(i,0,removed);
+  });
+}
+function adminHelp(el){
+  el.innerHTML = `<div class="card help">
+    <h3>How this portal works (staff guide)</h3>
+    <h4>The big picture</h4>
+    <p>The website is hosted free on <b>GitHub Pages</b>, and all of its data — the slide list and the access keys — lives in one file in the repo: <code>data/portal.json</code>. When an admin saves a change here, the page commits that file to GitHub. That\u2019s why saving needs a GitHub token: GitHub itself refuses any change without it, which is what makes the admin side genuinely tamper-proof from students.</p>
+    <h4>One-time setup (repo owner)</h4>
+    <ol>
+      <li>Create a <b>public</b> GitHub repository and upload <code>index.html</code> plus the folder <code>data/portal.json</code>.</li>
+      <li>In the repo: Settings \u2192 Pages \u2192 deploy from the <code>main</code> branch. Your site appears at <code>https://&lt;username&gt;.github.io/&lt;repo&gt;/</code>.</li>
+      <li>Create the staff token: GitHub \u2192 Settings \u2192 Developer settings \u2192 <b>Fine-grained personal access tokens</b> \u2192 Generate. Choose <b>Only select repositories</b> \u2192 this repo, and under Repository permissions set <b>Contents \u2192 Read and write</b>. Nothing else. Set an expiry (e.g. end of summer).</li>
+      <li>Share that token privately with staff who post slides. Each admin pastes it once per session in the box at the top of this page.</li>
+      <li>Then change all three default keys under <b>Access keys</b>.</li>
+    </ol>
+    <h4>Posting slides (the weekly routine)</h4>
+    <ol>
+      <li>Upload the deck or PDF to Google Drive (or build in Google Slides).</li>
+      <li>Share \u2192 <b>Anyone with the link</b> \u2192 <b>Viewer</b> \u2192 Copy link.</li>
+      <li><b>Add slide</b>: paste the link (it\u2019s validated — wrong links get a clear error), name it, pick section and week, optionally hide it until you\u2019re ready.</li>
+      <li>Changes go live in seconds. If a student\u2019s page was already open, they see it after a refresh.</li>
+    </ol>
+    <h4>Keys and access</h4>
+    <ul>
+      <li>One student key per section (Explore / Challenge); unlimited admin keys, each labelled so you know whose is whose.</li>
+      <li>Everyone re-enters their key when they reopen the page — nothing is remembered on shared devices.</li>
+      <li>Reading is soft-gated: the keys stop casual snooping, but this is a public repo, so a tech-savvy person could find the slide links. Fine for camp decks; never post sensitive info.</li>
+      <li>Writing is hard-gated: no token, no changes — enforced by GitHub, not by this page.</li>
+    </ul>
+    <h4>Good to know</h4>
+    <ul>
+      <li>No user limits — any number of students or staff at once.</li>
+      <li>Every save is a git commit, so the repo history is a free backup: anything deleted by mistake can be recovered from GitHub\u2019s history.</li>
+      <li>If two admins save at the same instant, the portal retries automatically; the later save wins.</li>
+      <li>Using a custom domain? Set <code>OWNER</code> and <code>REPO</code> near the top of <code>index.html</code>.</li>
+    </ul>
+  </div>`;
+}
+
+/* ---------- boot ---------- */
+(async function boot(){
+  try{
+    await loadPortal();
+    go('home');
+  }catch(e){
+    app.innerHTML = `<div class="empty"><b>Portal data not found</b>
+      The site couldn\u2019t load <code>data/portal.json</code>. Make sure the repo has that file, GitHub Pages is enabled, and try a hard refresh.</div>`;
+  }
+})();
+</script>
+</body>
+</html>
