@@ -406,7 +406,6 @@ function renderStudent(section){
   app.innerHTML = `
     <div class="sec-head">
       <h1>${SECTION_LABEL[section]}</h1>
-      <span class="pill" style="background:${color}">${section==='explore'?'Ages 6\u20138':'Ages 9\u201314'}</span>
     </div>
     ${body}`;
   app.querySelectorAll('.week>button').forEach(btn=>{
