@@ -138,7 +138,7 @@
 <main id="app"><div class="loading">Loading the camp portal&hellip;</div></main>
 
 <footer>
-  <span>&copy; 2026 Parents Engaged in Education &middot; Website by Faizan Alam &middot;</span>
+  <span>&copy; 2026 Parents Engaged in Education &middot; Website by Faizan Alam</span>
   <button id="adminLink">Staff sign-in</button>
 </footer>
 
@@ -415,7 +415,7 @@ function renderStudent(section){
 
 /* ---------- admin ---------- */
 function renderAdmin(){
-  const tabs = [['list','All slides'],['add', editingId?'Edit slide':'Add slide'],['keys','Access keys'],['help','How it works']];
+  const tabs = [['list','All slides'],['add', editingId?'Edit slide':'Add slide'],['attend','Attendance'],['keys','Access keys'],['help','How it works']];
   app.innerHTML = `
     <div class="sec-head">
       <h1>Admin</h1><span class="pill" style="background:var(--navy)">Staff only</span>
@@ -438,6 +438,7 @@ function renderAdmin(){
   const body = document.getElementById('tabBody');
   if(adminTab==='list') return adminList(body);
   if(adminTab==='add') return adminForm(body);
+  if(adminTab==='attend') return adminAttend(body);
   if(adminTab==='keys') return adminKeys(body);
   if(adminTab==='help') return adminHelp(body);
 }
@@ -597,6 +598,13 @@ function adminHelp(el){
       <li>Reading is soft-gated: the keys stop casual snooping, but this is a public repo, so a tech-savvy person could find the slide links. Fine for camp decks; never post sensitive info.</li>
       <li>Writing is hard-gated: no token, no changes — enforced by GitHub, not by this page.</li>
     </ul>
+    <h4>Attendance</h4>
+    <ul>
+      <li>The <b>Attendance</b> tab is a doorway to the shared Google Sheet where attendance is actually taken \u2014 one column per camp day, P/L/A dropdowns, totals per student.</li>
+      <li>Access is controlled by Google, not by this site: share the Sheet with each staff member\u2019s Google email as Editor and keep general access <b>Restricted</b>. Staff sign in to Google once per device and Google remembers them.</li>
+      <li>No GitHub token is needed to take or export attendance \u2014 only to set or change the sheet link here. Export any time from the Sheet via File \u2192 Download \u2192 CSV.</li>
+      <li>Never make the Sheet \u201Canyone with the link\u201D \u2014 it contains children\u2019s names and parent emails.</li>
+    </ul>
     <h4>Good to know</h4>
     <ul>
       <li>No user limits — any number of students or staff at once.</li>
@@ -605,6 +613,40 @@ function adminHelp(el){
       <li>Using a custom domain? Set <code>OWNER</code> and <code>REPO</code> near the top of <code>index.html</code>.</li>
     </ul>
   </div>`;
+}
+
+/* ---------- attendance: link to the Google Sheet ---------- */
+function adminAttend(el){
+  const url = portal.attendanceUrl || '';
+  el.innerHTML = `<div class="card">
+    <h3>Attendance sheet</h3>
+    ${url ? `
+      <p style="font-size:14.5px;color:var(--mute);margin-bottom:16px">Attendance is taken in the shared Google Sheet. It opens in a new tab \u2014 Google\u2019s own sharing controls who can view or edit it, so no GitHub token is needed.</p>
+      <div class="row-actions">
+        <a class="btn btn-green" style="text-decoration:none;display:inline-block" href="${esc(url)}" target="_blank" rel="noopener">Open attendance sheet \u2192</a>
+      </div>
+    ` : `
+      <p style="font-size:14.5px;color:var(--mute);margin-bottom:10px">No sheet is linked yet. Set it up once:</p>
+      <ol style="font-size:14px;color:var(--ink);padding-left:22px;margin-bottom:14px">
+        <li>Upload the attendance spreadsheet to Google Drive and open it as a Google Sheet.</li>
+        <li>Click <b>Share</b> and add each staff member\u2019s Google email as an <b>Editor</b>. Keep general access on <b>Restricted</b> \u2014 it contains kids\u2019 names and parent emails.</li>
+        <li>Copy the sheet\u2019s link and paste it below (needs the GitHub connection, one time only).</li>
+      </ol>
+    `}
+    <h3 style="margin-top:20px">${url?'Change the link':'Set the link'}</h3>
+    <div class="frm"><div class="full"><label>Google Sheet link</label>
+      <input id="attUrl" placeholder="https://docs.google.com/spreadsheets/d/..." value="${esc(url)}"></div></div>
+    <div class="row-actions"><button class="btn btn-blue" id="attUrlSave">Save link</button></div>
+    <div class="note warn" style="margin-top:14px">Keep the Sheet\u2019s sharing on <b>Restricted</b> (specific staff emails only). Never use \u201Canyone with the link\u201D \u2014 the button\u2019s link is visible to anyone who digs through the site code, so Google\u2019s permissions are the real lock.</div>
+  </div>`;
+  document.getElementById('attUrlSave').onclick = async ()=>{
+    const v = document.getElementById('attUrl').value.trim();
+    if(!/^https:\/\/docs\.google\.com\/spreadsheets\/d\//.test(v)) return toast('That doesn\u2019t look like a Google Sheets link \u2014 open the sheet and copy its address');
+    const old = portal.attendanceUrl;
+    portal.attendanceUrl = v;
+    if(await savePortal('attendance sheet link updated')) renderAdmin();
+    else portal.attendanceUrl = old;
+  };
 }
 
 /* ---------- boot ---------- */
